@@ -1,0 +1,63 @@
+# AI Video Generator - Python Dependencies
+# Backend: FastAPI with SQLite, DeepSeek AI, Pixabay, ElevenLabs
+# Version: 1.0.0
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+aiosqlite==0.19.0
+alembic==1.12.1
+
+# HTTP Client (for API calls)
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Image/Video Processing
+Pillow==10.1.0
+opencv-python-headless==4.8.1.78
+moviepy==1.0.3
+
+# Audio Processing
+pydub==0.25.1
+soundfile==0.12.1
+
+# Data Validation
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Async Support
+asyncio==3.4.3
+anyio==4.0.0
+
+# Logging
+loguru==0.7.2
+
+# Utilities
+python-multipart==0.0.6
+jinja2==3.1.2
+aiofiles==23.2.1
+
+# Testing (optional but recommended)
+pytest==7.4.3
+pytest-asyncio==0.23.2
+httpx==0.25.2
+
+# Development Tools (optional)
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# API Client Libraries (if needed)
+# deepseek-ai-sdk is not available as pip package, using httpx directly
+# pixabay-python is not maintained, using httpx directly  
+# elevenlabs-python-sdk is available but we'll use httpx for consistency
+
+# Note: DeepSeek AI, Pixabay, and ElevenLabs are accessed via REST APIs
+# using httpx client, so no specific SDK packages are required.
