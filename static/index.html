@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Video Generator · DeepSeek + Pixabay + ElevenLabs</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ----- RESET & BASE ----- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0b0d11;
+            color: #e8edf5;
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.2s;
+        }
+        a { color: #7aa2f7; text-decoration: none; }
+        a:hover { color: #b3c9ff; }
+        button { cursor: pointer; font-family: inherit; border: none; background: none; }
+        input, textarea { font-family: inherit; }
+
+        /* ----- SCROLLBAR (dark) ----- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1d25; }
+        ::-webkit-scrollbar-thumb { background: #3b4050; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a6175; }
+
+        /* ----- SIDEBAR (toggle) ----- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: #12151c;
+            border-right: 1px solid #252a33;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transform: translateX(0);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.25s;
+            z-index: 100;
+            visibility: visible;
+            overflow-y: auto;
+        }
+        .sidebar.closed {
+            transform: translateX(-100%);
+            visibility: hidden;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-header h2 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .sidebar-toggle-btn {
+            background: #1f232d;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a9b3cf;
+            font-size: 1.2rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar-toggle-btn:hover { background: #2b313e; color: white; }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .session-item {
+            background: #1a1e28;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #c8d0e3;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+            word-break: break-word;
+        }
+        .session-item:hover {
+            background: #242a38;
+            border-left-color: #7aa2f7;
+        }
+        .session-item.active {
+            border-left-color: #bb9af7;
+            background: #202636;
+        }
+
+        .sidebar-footer {
+            font-size: 0.75rem;
+            color: #6b738b;
+            border-top: 1px solid #252a33;
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        /* ----- MAIN LAYOUT ----- */
+        .main-wrapper {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .main-wrapper.expanded {
+            margin-left: 0;
+        }
+
+        /* ----- TOP BAR (mobile toggle) ----- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            background: #0f1219;
+            border-bottom: 1px solid #1f232d;
+            gap: 1rem;
+            min-height: 64px;
+        }
+        .hamburger {
+            font-size: 1.5rem;
+            color: #a9b3cf;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: background 0.15s ease;
+        }
+        .hamburger:hover { background: #1f232d; color: white; }
+        .topbar-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #e8edf5;
+        }
+        .topbar-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            background: #181c26;
+            padding: 6px 14px;
+            border-radius: 40px;
+        }
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background-color: #3fb950; /* green = ready */
+        }
+        .status-dot.busy { background-color: #f0883e; }
+
+        /* ----- CHAT CONTAINER ----- */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2rem 1rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* ----- MESSAGE BUBBLES (animations) ----- */
+        .message {
+            max-width: 80%;
+            padding: 0.9rem 1.4rem;
+            border-radius: 24px;
+            line-height: 1.55;
+            font-size: 0.95rem;
+            animation: msgSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            word-break: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        @keyframes msgSlideIn {
+            0% { opacity: 0; transform: translateY(16px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(145deg, #2b3a67, #1e2a4f);
+            border-bottom-right-radius: 6px;
+        }
+        .message.assistant {
+            align-self: flex-start;
+            background: #1c212b;
+            border-bottom-left-radius: 6px;
+        }
+        .message.system {
+            align-self: center;
+            background: #20252f80; 
+            backdrop-filter: blur(4px);
+            border-radius: 40px; 
+            padding: 0.5rem 1.4rem; 
+            font-size:.85rem; 
+            color:#a9b3cf; 
+        }
+        .message.error {
+            align-self : center ; 
+           background :#3d2025 ; 
+           color :#f7a8b8 ; 
+           border-radius :20px ; 
+           padding :0.6rem  1.4rem ; 
+           font-size :0.9rem ;
+           border :1px solid #b34a5a ;
+         }
+
+         /* typing indicator */
+         .typing-indicator {
+             align-self : flex-start ; 
+             display :flex ; 
+             gap :6px ; 
+             padding :12px  20px ; 
+             background :#1c212b ; 
+             border-radius :40px ; 
+             animation :msgSlideIn  0.25s ;
+         }
+         .typing-indicator span {
+             width :10px ; height :10px ; 
+             background :#7aa2f7 ; 
+             border-radius :50% ; 
+             animation :blink  1s infinite ;
+         }
+         .typing-indicator span:nth-child(2) { animation-delay :0.15s ; }
+         .typing-indicator span:nth-child(3) { animation-delay :0.30s ; }
+         @keyframes blink {
+             0%,100%{ opacity :0.3 ; transform :scale(0.9) ;}
+             50%{ opacity :1 ; transform :scale(1.2) ;}
+         }
+
+         /* ----- INPUT AREA ----- */
+         .input-area {
+             padding :1rem  2rem  1.5rem  2rem ; 
+             background :#0f1219 ; 
+             border-top :1px solid #1f232d ;
+         }
+         .input-row {
+             display :flex ; 
+             gap :12px ; 
+             align-items :center ; 
+             background :#181c26 ; 
+             padding :6px  6px  6px  18px ; 
+             border-radius :60px ; 
+             border :1px solid #252a33 ;
+             transition :border-color  0.15s ;
+         }
+         .input-row.focused { border-color :#7aa2f7 ; box-shadow :0  0  0  2px rgba(122,162,247,0.15) ;}
+         .input-row input {
+             flex :1 ; 
+             background :transparent ; 
+             border :none ; 
+             padding :12px  6px ; 
+             color :#e8edf5 ; 
+             font-size :1rem ; 
+             outline :none ;
+         }
+         .input-row input::placeholder { color:#5a6175 ; letter-spacing:-0.2px; }
+
+         .btn-send {
+             background :#7aa2f7 ; 
+             width :46px ; height :46px ; 
+             border-radius :50% ; 
+             display :flex ; align-items :center ; justify-content :center ;
+             color :#0b0d11 ; font-size :1.3rem ;
+             transition :all  0.15s ease ;
+             flex-shrink :0 ;
+         }
+         .btn-send:hover { background :#9bb9ff ; transform :scale(1.03) ;}
+         .btn-send.disabled { opacity :0.4 ; pointer-events :none ;}
+
+         /* ----- RESPONSIVE ----- */
+         @media (max-width :768px) {
+             .sidebar { width :260px ;}
+             .main-wrapper { margin-left :260px ;}
+             .main-wrapper.expanded { margin-left :0 ;}
+             .chat-container { padding :1rem  1rem  0.5rem  1rem ;}
+             .input-area { padding :0.8rem  1rem  1rem  1rem ;}
+             .message { max-width :92% ; font-size :0.9rem ;}
+         }
+         @media (max-width :480px) {
+             .sidebar { width :100% !important ; max-width :320px ;}
+             .main-wrapper { margin-left :100% !important ;}
+             .main-wrapper.expanded { margin-left :0 !important ;}
+             .topbar-title { font-size :1rem ;}
+         }
+
+         /* utility */
+         .hidden { display:none !important;}
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Session sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-video" style="margin-right:.4rem;"></i>AI Video</h2>
+            <button class="sidebar-toggle-btn" id="closeSidebarBtn" aria-label="Close sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="session-list" id="sessionList">
+            <div class="session-item active">Current session</div>
+        </div>
+        <div class="sidebar-footer">
+           <i class="fas fa-shield-alt"></i> DeepSeek · Pixabay · ElevenLabs
+        </div>
+    </aside>
+
+    <!-- ===== MAIN WRAPPER ===== -->
+    <div class="main-wrapper" id="mainWrapper">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <button class="hamburger" id="openSidebarBtn" aria-label="Open sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="topbar-title">Video Generator</span>
+            <div class="topbar-status">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">ready</span>
+                <i class="fas fa-microchip" style="margin-left:.3rem;"></i>
+                <span style="font-weight:.8rem;">v2</span>
+           </div>
+        </header>
+
+        <!-- CHAT CONTAINER -->
+        <div class="chat-container" id="chatContainer" role="log" aria-live="polite">
+           <!-- welcome message -->
+           <div class="message assistant">
+               <i class="fas fa-robot" style="margin-right:.4rem;"></i> 
+               Hello! I'm your AI video assistant.<br> Send me a topic and I'll generate a script, fetch media & create a voiceover.
+           </div>
+           <!-- messages will be appended here -->
+           <div id="messagesWrapper"></div>
+           <!-- typing indicator placeholder -->
+           <div id="typingIndicator" class="hidden typing-indicator">
+               <span></span><span></span><span></span>
+           </div>
+       </div>
+
+       <!-- INPUT AREA -->
+       <div class="input-area">
+           <form id="chatForm" autocomplete="off">
+               <div class="input-row" id="inputRow">
+                   <input type="text" id="userInput" placeholder="Enter a topic (e.g., 'deep sea exploration')" required aria-label="Message input">
+                   <button type="submit" class="btn-send" id="sendBtn" aria-label="Send message">
+                       <i class="fas fa-paper-plane"></i>
+                   </button>
+               </div>
+           </form>
+       </div>
+   </div>
+
+   <!-- ===== JAVASCRIPT ===== -->
+   <script>
+       (function() {
+           'use strict';
+
+           // DOM refs
+           const sidebar = document.getElementById('sidebar');
+           const mainWrapper = document.getElementById('mainWrapper');
+           const openSidebarBtn = document.getElementById('openSidebarBtn');
+           const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+           const chatContainer = document.getElementById('chatContainer');
+           const messagesWrapper = document.getElementById('messagesWrapper');
+           const typingIndicator = document.getElementById('typingIndicator');
+           const chatForm = document.getElementById('chatForm');
+           const userInput = document.getElementById('userInput');
+           const sendBtn = document.getElementById('sendBtn');
+           const statusDot = document.getElementById('statusDot');
+           const statusText = document.getElementById('statusText');
+
+           // state
+           let isProcessing = false;
+
+           // ---------- SIDEBAR TOGGLE ----------
+           function openSidebar() {
+               sidebar.classList.remove('closed');
+               mainWrapper.classList.remove('expanded');
+               localStorage.setItem('sidebarState', 'open');
+           }
+
+           function closeSidebar() {
+               sidebar.classList.add('closed');
+               mainWrapper.classList.add('expanded');
+               localStorage.setItem('sidebarState', 'closed');
+           }
+
+           // restore sidebar state
+           (function initSidebar() {
+               const saved = localStorage.getItem('sidebarState');
+               if (saved === 'closed') {
+                   closeSidebar();
+               } else {
+                   openSidebar();
+               }
+           })();
+
+           openSidebarBtn.addEventListener('click', openSidebar);
+           closeSidebarBtn.addEventListener('click', closeSidebar);
+
+           // ---------- UI HELPERS ----------
+           function setStatusBusy(busy = true) {
+               if (busy) {
+                   statusDot.classList.add('busy');
+                   statusText.textContent = 'generating';
+                   sendBtn.classList.add('disabled');
+                   isProcessing = true;
+               } else {
+                   statusDot.classList.remove('busy');
+                   statusText.textContent = 'ready';
+                   sendBtn.classList.remove('disabled');
+                   isProcessing = false;
+               }
+           }
+
+           function appendMessage(content, role = 'assistant', extraClass = '') {
+               const div = document.createElement('div');
+               div.className = `message ${role} ${extraClass}`;
+
+               // simple markdown-like bold/italic (only basic)
+               let formatted = content
+                   .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                   .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                   .replace(/\n/g, '<br>');
+
+               div.innerHTML = formatted;
+
+               // Insert before typing indicator
+               if (typingIndicator && !typingIndicator.classList.contains('hidden')) {
+                   messagesWrapper.insertBefore(div, typingIndicator);
+               } else {
+                   messagesWrapper.appendChild(div);
+               }
+
+               // auto scroll
+               requestAnimationFrame(() => {
+                   chatContainer.scrollTop = chatContainer.scrollHeight + 60;
+               });
+
+               return div;
+           }
+
+           function showTyping() {
+               typingIndicator.classList.remove('hidden');
+               chatContainer.scrollTop = chatContainer.scrollHeight + 60;
+           }
+
+           function hideTyping() {
+               typingIndicator.classList.add('hidden');
+           }
+
+           function showError(msg) {
+               appendMessage(msg || 'Something went wrong.', 'error');
+           }
+
+           // ---------- API CALL ----------
+           async function sendTopic(topic) {
+               if (!topic || topic.trim().length === 0) return;
+
+               // disable input & show user message
+               userInput.value = '';
+               appendMessage(topic.trim(), 'user');
+
+               setStatusBusy(true);
+               showTyping();
+
+               try {
+                   const response = await fetch('/api/generate', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ topic_text: topic.trim() })
+                   });
+
+                   hideTyping();
+
+                   if (!response.ok) {
+                       let errMsg = `Server error ${response.status}`;
+                       try {
+                           const errData = await response.json();
+                           if (errData.detail) errMsg = errData.detail;
+                       } catch (_) {}
+                       throw new Error(errMsg);
+                   }
+
+                   const data = await response.json();
+
+                   // data fields expected:
+                   // script, media_urls (array), voiceover_url (string)
+                   let replyHtml = `<i class="fas fa-scroll"></i> <strong>Script generated</strong><br>`;
+                   if (data.script) {
+                       replyHtml += `${data.script.substring(0,800)}`;
+                       if (data.script.length >800) replyHtml += `…`;
+                   } else {
+                       replyHtml += `(script placeholder)`;
+                   }
+
+                   if (data.media_urls && Array.isArray(data.media_urls) && data.media_urls.length >0) {
+                       replyHtml += `<br><br><i class="fas fa-images"></i> Media found (${data.media_urls.length})`;
+                       // show first two thumbnails
+                       const maxThumb = Math.min(data.media_urls.length,2);
+                       for (let i=0;i<maxThumb;i++) {
+                           replyHtml += `<br><img src="${data.media_urls[i]}" alt="media preview" style="max-width:100%;border-radius:12px;margin-top:.4rem;">`;
+                       }
+                   } else {
+                       replyHtml += `<br><span style="opacity:.7;">No media returned.</span>`;
+                   }
+
+                   if (data.voiceover_url && typeof data.voiceover_url === 'string') {
+                       replyHtml += `<br><br><i class="fas fa-headphones"></i> Voiceover ready<br>`;
+                       replyHtml += `<audio controls style="width:100%;margin-top:.3rem;" src="${data.voiceover_url}">Your browser does not support audio.</audio>`;
+                   } else {
+                       replyHtml += `<br><span style="opacity:.7;">No voiceover generated.</span>`;
+                   }
+
+                   appendMessage(replyHtml, 'assistant');
+
+               } catch (err) {
+                   hideTyping();
+                   console.error('Generation error:', err);
+                   showError(`⚠️ ${err.message || 'Failed to generate video.'}`);
+               } finally {
+                   setStatusBusy(false);
+               }
+           }
+
+           // ---------- EVENT LISTENERS ----------
+           chatForm.addEventListener('submit', async function(e) {
+               e.preventDefault();
+               if (isProcessing) return;
+
+               const rawInput = userInput.value.trim();
+               if (!rawInput) return;
+
+               await sendTopic(rawInput);
+               userInput.focus();
+           });
+
+           // input row focus effect
+           userInput.addEventListener('focus', () => document.getElementById('inputRow').classList.add('focused'));
+           userInput.addEventListener('blur', () => document.getElementById('inputRow').classList.remove('focused'));
+
+           // keyboard shortcut / escape to close sidebar
+           document.addEventListener('keydown', (e) => {
+               if (e.key === 'Escape' && !sidebar.classList.contains('closed')) {
+                   closeSidebar();
+               }
+               // Ctrl+Enter to send from anywhere (if not focused)
+               if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                   if (!isProcessing && userInput.value.trim()) {
+                       chatForm.dispatchEvent(new Event('submit'));
+                   }
+               }
+           });
+
+           // ---------- INITIAL LOAD / SESSION STUB ----------
+           // We simulate a session list from backend later.
+           console.log('AI Video Generator UI ready.');
+
+       })();
+   </script>
+
+</body>
+</html>
