@@ -1,0 +1,223 @@
+```css
+/* ==========================================================================
+   AI Video Generator - Dark Theme Stylesheet
+   Version: 1.0.0
+   Description: Complete dark theme CSS with responsive design, sidebar toggle,
+                and message animations for the AI Video Generator chat interface.
+   ========================================================================== */
+
+/* ==========================================================================
+   CSS Custom Properties (Design Tokens)
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Dark Theme */
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-bg-tertiary: #1a1a2e;
+  --color-bg-card: #1e1e32;
+  --color-bg-input: #16162a;
+  --color-bg-hover: #252540;
+  --color-bg-active: #2a2a4a;
+
+  /* Text Colors */
+  --color-text-primary: #e8e8f0;
+  --color-text-secondary: #a0a0b8;
+  --color-text-muted: #6b6b80;
+  --color-text-accent: #7c7cff;
+
+  /* Accent Colors */
+  --color-accent-primary: #6366f1;
+  --color-accent-secondary: #818cf8;
+  --color-accent-tertiary: #4f46e5;
+  --color-accent-glow: rgba(99, 102, 241, 0.3);
+  --color-accent-gradient: linear-gradient(135deg, #6366f1, #818cf8);
+
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Border Colors */
+  --color-border-primary: rgba(255, 255, 255, 0.08);
+  --color-border-secondary: rgba(255, 255, 255, 0.12);
+  --color-border-accent: rgba(99, 102, 241, 0.3);
+
+  /* Shadow Tokens */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--color-accent-glow);
+
+  /* Typography */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Layout */
+  --sidebar-width: clamp(280px, 30vw, 400px);
+  --sidebar-collapsed-width: clamp(60px, 5vw, 80px);
+  
+  /* Border Radius */
+  --radius-sm: clamp(4px, calc(4px + (8 - 4) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), var(--radius-md));
+  
+/* Breakpoints for responsive calculations */
+--breakpoint-mobile: var(--bp-mobile);
+--breakpoint-tablet: var(--bp-tablet);
+--breakpoint-desktop: var(--bp-desktop);
+
+/* Animation */
+--transition-fast: clamp(150ms, calc(150ms + (200 -150) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), var(--transition-normal));
+--transition-normal: clamp(200ms, calc(200ms + (300 -200) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), var(--transition-slow));
+--transition-slow: clamp(300ms, calc(300ms + (500 -300) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), var(--transition-fast));
+
+/* Z-index layers */
+--z-sidebar: var(--z-index-sidebar);
+--z-header: var(--z-index-header);
+--z-modal-backdrop: var(--z-index-modal-backdrop);
+--z-modal-content: var(--z-index-modal-content);
+--z-tooltip: var(--z-index-tooltip);
+}
+
+/* ==========================================================================
+   Reset & Base Styles
+   ========================================================================== */
+
+*, *::before, *::after {
+box-sizing: border-box;
+margin: var(--spacing-xs);
+padding: var(--spacing-xs);
+border-width: initial;
+border-style: solid;
+border-color: initial;
+outline-width: initial;
+outline-style: solid;
+outline-color: initial;
+}
+
+html {
+scroll-behavior: smooth;
+-webkit-text-size-adjust: calc(100% + (100% -100%) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile))));
+-ms-text-size-adjust: calc(100% + (100% -100%) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile))));
+text-size-adjust: calc(100% + (100% -100%) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile))));
+}
+
+body {
+font-family: var(--font-family-base);
+font-size: var(--font-size-base);
+line-height: var(--line-height-normal);
+color-scheme: dark;
+background-color: var(--color-bg-primary);
+background-image:
+radial-gradient(ellipse at top left, rgba(99,102,241,.05) calc(var(--spacing-xs) + (var(--spacing-xs) -var(--spacing-xs)) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), transparent calc(var(--spacing-lg) + (var(--spacing-lg) -var(--spacing-lg)) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile))))),
+radial-gradient(ellipse at bottom right, rgba(129,140,248,.05) calc(var(--spacing-xs) + (var(--spacing-xs) -var(--spacing-xs)) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))), transparent calc(var(--spacing-lg) + (var(--spacing-lg) -var(--spacing-lg)) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile)))));
+min-height: calc(100vh + (100vh -100vh) * ((100vw - var(--breakpoint-mobile)) / (var(--breakpoint-desktop) - var(--breakpoint-mobile))));
+overflow-x:hidden; /* Prevent horizontal scroll on mobile */
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+h1,h2,h3,h4,h5,h6 {
+font-weight :var (--font-weight-semibold);
+line-height :var (--line-height-tight);
+color :var (--color-text-primary);
+margin-bottom :var (--spacing-sm);
+}
+
+h1 { font-size :var (--font-size-3xl); }
+h2 { font-size :var (--font-size-2xl); }
+h3 { font-size :var (--font-size-xl); }
+h4 { font-size :var (--font-size-lg); }
+h5 { font-size :var (--font-size-base); }
+h6 { font-size :var (--font-size-sm); }
+
+p { margin-bottom :var (--spacing-md); color :var (--color-text-secondary); }
+
+a {
+color :var (--color-accent-primary);
+text-decoration :none;
+transition :color var (--transition-fast) ease-in-out;
+}
+
+a:hover { color :var (--color-accent-secondary); text-decoration :underline; }
+
+code {
+font-family :var (--font-family-mono);
+background-color :var (--color-bg-tertiary);
+padding :calc(var (--spacing-xs) + .125rem) calc(var (--spacing-sm) + .125rem);
+border-radius :calc(var (--radius-sm) + .125rem);
+font-size :calc(var (--font-size-sm) + .0625rem);
+color :var (--color-accent-secondary);
+}
+
+pre {
+background-color :var (--color-bg-tertiary);
+padding :var (--spacing-md);
+border-radius :calc(var (--radius-md) + .125rem);
+overflow-x :auto;
+margin-bottom :var (--spacing-md);
+border :calc(.0625rem + .0625rem * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) solid var (--color-border-primary);
+}
+
+pre code {
+background-color :transparent;
+padding :calc(var (--spacing-xs) + .0625rem);
+border-radius :calc(var (--radius-sm) + .0625rem);
+}
+
+/* ==========================================================================
+   Layout Components
+   ========================================================================== */
+
+/* App Container */
+.app-container {
+display :flex;
+height :calc(100vh + .0625rem * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile))));
+overflow:hidden; /* Prevent double scrollbars */
+position :relative; /* For sidebar positioning context */
+}
+
+/* Sidebar Styles */
+.sidebar {
+width :var (--sidebar-width);
+min-width :calc(var (--sidebar-collapsed-width) + .0625rem * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile))));
+max-width :calc(var (--sidebar-width) + .0625rem * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile))));
+background-color :var (--color-bg-secondary);
+border-right :calc(.0625rem + .0625rem * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) solid var (--color-border-primary);
+display :flex;
+flex-direction :column;
+transition :width calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+min-width calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+max-width calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+transform calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+opacity calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+visibility calc(var (--transition-normal) + .0625s * ((100vw - var (--breakpoint-mobile)) / (var (--breakpoint-desktop) - var (--breakpoint-mobile)))) ease-in-out,
+box-shadow calc(var (--transition-normal) + .0625s * ((100vw - var
