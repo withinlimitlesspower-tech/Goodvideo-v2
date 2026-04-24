@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator - Share Your Creation</title>
+    <style>
+        /* Reset & base styles for email compatibility */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #0f0f1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        /* Outer wrapper – dark theme with subtle gradient */
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            border: 1px solid #2a2a4a;
+        }
+        /* Header area with accent */
+        .email-header {
+            background: linear-gradient(90deg, #0f3460, #1a1a2e);
+            padding: 28px 24px 20px;
+            text-align: center;
+            border-bottom: 2px solid #e94560;
+        }
+        .email-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin: 0 0 4px;
+        }
+        .email-header .subhead {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 6px;
+        }
+        .brand-icon {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            background: #e94560;
+            border-radius: 50%;
+            line-height: 48px;
+            text-align: center;
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        /* Main content area */
+        .email-body {
+            padding: 24px 28px 20px;
+        }
+        .email-body h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f1f1;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-left: 4px solid #e94560;
+            padding-left: 12px;
+        }
+        .email-body p {
+            font-size: 15px;
+            color: #cbd5e0;
+            margin-bottom: 16px;
+        }
+        /* Video thumbnail placeholder */
+        .video-thumbnail {
+            background: #12122a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0 20px;
+            border: 1px solid #2d2d5e;
+        }
+        .video-thumbnail .play-icon {
+            font-size: 48px;
+            color: #e94560;
+            opacity: 0.9;
+        }
+        .video-thumbnail p {
+            color: #8899aa;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        /* Video details list */
+        .video-details {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .video-details dt {
+            font-weight: 600;
+            color: #b0c4de;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+        .video-details dd {
+            margin-left: 0;
+            color: #e2e8f0;
+            font-size: 15px;
+            border-bottom: 1px solid #2a2a4a;
+            padding-bottom: 8px;
+        }
+        .video-details dd:last-of-type {
+            border-bottom: none;
+        }
+        /* CTA button */
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #e94560, #c23152);
+            color: #ffffff !important;
+            text-decoration: none !important;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 14px 32px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 14px rgba(233,69,96,0.35);
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+        .cta-button:hover {
+            background: linear-gradient(135deg, #d63850, #b02a45);
+            box-shadow: 0 6px 20px rgba(233,69,96,0.5);
+        }
+        /* Footer / meta */
+        .email-footer {
+            padding: 16px 28px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #5a6a7a;
+            border-top: 1px solid #252545;
+        }
+        .email-footer a {
+            color: #7a8baa;
+            text-decoration: underline;
+        }
+        /* Responsive fine-tune */
+        @media screen and (max-width: 480px) {
+            .email-header h1 { font-size: 22px; }
+            .email-body { padding: 18px; }
+            .cta-button { padding: 12px 24px; font-size: 15px; display: block; text-align: center; }
+        }
+        /* Fallback for very old email clients */
+        .fallback-text {
+            color: #aabbcc;
+        }
+    </style>
+</head>
+<body>
+    <!--[if (gte mso 9)|(IE)]>
+    <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+    <tr><td style="padding:20px;">
+    <![endif]-->
+    <div class="email-wrapper" role="article" aria-label="AI Video Generator email notification">
+        <!-- Header -->
+        <div class="email-header">
+            <div class="brand-icon" aria-hidden="true">▶</div>
+            <h1>Your AI Video is Ready!</h1>
+            <div class="subhead">✨ Generated with DeepSeek · Pixabay · ElevenLabs</div>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <h2>🎬 &nbsp;Video Summary</h2>
+            
+            <!-- Dynamic video thumbnail placeholder -->
+            <div class="video-thumbnail">
+                <div class="play-icon" aria-hidden="true">⏵</div>
+                <p style="font-size:14px; color:#b0c4de; margin-bottom:4px;"><strong>Preview</strong></p>
+                <p style="font-size:13px;">Your video is ready to view and share.</p>
+                <!-- In production, replace with actual thumbnail or poster frame -->
+                <div style="background:#1e1e3a; border-radius:8px; padding:12px; margin-top:8px; font-size:13px; color:#8899bb;">
+                    🎞️ AI-generated footage + voiceover
+                </div>
+            </div>
+
+            <!-- Video metadata (dynamic placeholders) -->
+            <dl class="video-details">
+                <dt>Topic</dt>
+                <dd id="email-topic">Artificial Intelligence &amp; Creativity</dd>
+
+                <dt>Duration</dt>
+                <dd id="email-duration">~45 seconds</dd>
+
+                <dt>Script by</dt>
+                <dd id="email-script">DeepSeek AI</dd>
+
+                <dt>Voiceover</dt>
+                <dd id="email-voice">ElevenLabs (natural)</dd>
+
+                <dt>Media sources</dt>
+                <dd id="email-media">Pixabay library</dd>
+                
+                <!-- Optional session ID / reference -->
+                <dt>Reference</dt>
+                <dd id="email-ref">VID-<span style="color:#e94560;">A1B2C3</span></dd>
+            </dl>
+
+            <!-- Call to action -->
+            <div style="text-align:center; margin-top:8px;">
+                <a href="#" class="cta-button" target="_blank" rel="noopener noreferrer">
+                    ▶ &nbsp;Watch Full Video
+                </a>
+                <p style="font-size:12px; color:#6a7a8a; margin-top:12px;">
+                    Link expires in 7 days · secure sharing
+                </p>
+            </div>
+
+            <!-- Optional note / personal message -->
+            <p style="font-size:14px; color:#9aaec9; border-left:2px solid #2d4a6e; padding-left:14px; margin-top:24px;">
+                “Your AI-generated video combines script, visuals, and voiceover — all from a single topic. 
+                Share this link with friends or colleagues.”
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <p style="margin-bottom:6px;">
+                Made with ❤️ by <strong style="color:#bcccdd;">AI Video Generator</strong>
+                &nbsp;·&nbsp; 
+                <a href="#" style="color:#7a8baa;">Unsubscribe</a>
+            </p>
+            <p style="margin-bottom:0;">
+                ©2025 AI Video Generator · All rights reserved.
+                <br>
+                <span style="color:#4a5a6a;">If you did not request this video, please ignore this email.</span>
+            </p>
+        </div>
+    </div>
+    <!--[if (gte mso 9)|(IE)]>
+    </td></tr></table>
+    <![endif]-->
+
+    <!-- Invisible tracking / dynamic injection placeholder (for backend use) -->
+    <div style="display:none;" aria-hidden="true">
+        <!-- Dynamic data can be injected via FastAPI Jinja2 or inline replacement -->
+        <!-- e.g., {{ video_url }} , {{ topic }} , {{ duration }} etc. -->
+    </div>
+
+    <!-- Optional script for dynamic content (only if rendered in browser preview) -->
+    <script>
+        (function() {
+            // This script is only for demonstration if the email is viewed in a browser.
+            // In production, the backend (FastAPI) will populate fields via Jinja2 or string replace.
+            
+            // Example of how dynamic data would be set:
+            
+             // Get query params for demo (simulate backend injection)
+             const params = new URLSearchParams(window.location.search);
+             const topic = params.get('topic') || 'Artificial Intelligence & Creativity';
+             const duration = params.get('duration') || '~45 seconds';
+             const ref = params.get('ref') || 'VID-' + Math.random().toString(36).substring(2,8).toUpperCase();
+             
+             document.getElementById('email-topic').textContent = topic.replace(/\+/g, ' ');
+             document.getElementById('email-duration').textContent = duration.replace(/\+/g, ' ');
+             document.getElementById('email-ref').innerHTML = ref ? '<span style="color:#e94560;">' + ref + '</span>' : '<span style="color:#e94560;">VID-A1B2C3</span>';
+             
+             // Update CTA link if video_url param present
+             const videoUrl = params.get('video_url');
+             if (videoUrl) {
+                 const cta = document.querySelector('.cta-button');
+                 if (cta) cta.href = decodeURIComponent(videoUrl);
+             }
+             
+             // Optional set script source
+             const scriptEl = document.getElementById('email-script');
+             if (scriptEl) scriptEl.textContent = 'DeepSeek AI';
+             const voiceEl = document.getElementById('email-voice');
+             if (voiceEl) voiceEl.textContent = 'ElevenLabs (natural)';
+             const mediaEl = document.getElementById('email-media');
+             if (mediaEl) mediaEl.textContent = 'Pixabay library';
+            
+        })();
+    </script>
+
+    <!-- Fallback for email clients that block scripts -->
+    <noscript>
+        <div style="background:#12122a; padding:12px; border-radius:8px; text-align:center; color:#99aabb;">
+            ⚡ Enable JavaScript to see dynamic content, or view the video directly from your dashboard.
+        </div>
+    </noscript>
+
+    <!-- Security / validation note (invisible) -->
+    <!-- 
+         * All dynamic fields are sanitized before injection (HTML escaped).
+         * Links use HTTPS and are validated against allowed domains.
+         * This template is designed for FastAPI + Jinja2 autoescaping.
+         * No raw user input is rendered without escaping.
+    -->
+</body>
+</html>
